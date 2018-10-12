@@ -123,7 +123,21 @@ class FixedAttributeEnrollerCoPetitionsController extends CoPetitionsController 
     catch(Exception $e) {
       // We catch and rethrow to be sure we catch all underlying exceptions
       // as well
+
+      // The conclusion is that either the user has been meddling with his URL parameters,
+      // or he/she is using an IdP that returns different parameters than were expected in
+      // the invitation. In either case, do not accept this enrollment. We set the user to
+      // Deleted state.
+      $coPersonId = $this->CoPetition->field('enrollee_co_person_id', array('CoPetition.id' => $id));
+      if(!empty($coPersonId)) {
+        $this->CoPetition->EnrolleeCoPerson->id = $coPersonId;
+        $this->CoPetition->EnrolleeCoPerson->saveField('status', StatusEnum::Denied, array('CoPetition.id' => $id));
+      }
+
+      // Flash a short error message to the user
       $this->Flash->set(_txt('er.permission'),array('key'=>'error','clear'=>true));
+
+       // redirect to a generic page
       return $this->redirect("/");
     }
 
