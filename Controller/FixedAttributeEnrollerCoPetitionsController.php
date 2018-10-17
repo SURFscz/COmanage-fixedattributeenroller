@@ -132,7 +132,13 @@ class FixedAttributeEnrollerCoPetitionsController extends CoPetitionsController 
       if(!empty($coPersonId)) {
         $this->CoPetition->EnrolleeCoPerson->id = $coPersonId;
         $this->CoPetition->EnrolleeCoPerson->saveField('status', StatusEnum::Denied, array('CoPetition.id' => $id));
+
+        // update all the roles of this user as well
+        // We actually need to quote the value according to database rules, because Cake assumes the values do not
+        // need to be quoted if an array of conditions is passed...
+        $this->CoPetition->EnrolleeCoPerson->CoPersonRole->updateAll(array('CoPersonRole.status'=>'\''.StatusEnum::Denied.'\''),array('CoPersonRole.co_person_id'=>$coPersonId)); 
       }
+      $this->CoPetition->updateStatus($id, PetitionStatusEnum::Denied, null);
 
       // Flash a short error message to the user
       $this->Flash->set(_txt('er.permission'),array('key'=>'error','clear'=>true));
