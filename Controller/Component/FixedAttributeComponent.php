@@ -157,4 +157,26 @@ class FixedAttributeComponent extends Component {
      }
      return $returnvalues;
    }
+
+  /**
+   * Run over all parameters and see if they all validate.
+   *
+   * This is the convenience check to run to validate the fixed-attribute settings
+   */
+  public function checkAttributes($copetition) {
+    try
+    {
+      $values = $this->parseUrl($copetition['CoPetition']['return_url']);
+
+      if(sizeof($values) && is_array($values)) {
+        foreach($values as $key=>$value) {
+          $this->matchAttribute($copetition['EnrolleeOrgIdentity'], $key,$value);
+        }
+      }
+    }
+    catch (Exception $e) {
+      return false;
+    }
+    return true;
+  }
 }

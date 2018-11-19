@@ -111,19 +111,7 @@ class FixedAttributeEnrollerCoPetitionsController extends CoPetitionsController 
 
     $copetition = $this->CoPetition->find('first', $args);
 
-    try {
-      $values = $this->FixedAttribute->parseUrl($copetition['CoPetition']['return_url']);
-
-      if(sizeof($values) && is_array($values)) {
-        foreach($values as $key=>$value) {
-          $this->FixedAttribute->matchAttribute($copetition['EnrolleeOrgIdentity'], $key,$value);
-        }
-      }
-    }
-    catch(Exception $e) {
-      // We catch and rethrow to be sure we catch all underlying exceptions
-      // as well
-
+    if(!$this->FixedAttribute->checkAttributes($copetition)) {
       // The conclusion is that either the user has been meddling with his URL parameters,
       // or he/she is using an IdP that returns different parameters than were expected in
       // the invitation. In either case, do not accept this enrollment. We set the user to
